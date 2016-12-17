@@ -1,0 +1,106 @@
+RTC CLock Observations:
+1) I have a green coloured DS1307 RTC which was used by earlier interns.
+2) It seems to work well. When Pi is running and I take out the cell the RTC still works from the 5V power (AND NOT 3.3V) coming from RasPi.
+3) Test: What happens when RasPi is off but RasPi's power is on for few minutes
+	Expected Result: RTC should continue 'counting' time
+	Actual Result: Clock doesn't work when RasPi in this case :( It maybe bcos RasPi is not providing 5V in this case to the pin -> I just double checked that power in this case is still 5V across DS1307. This is strange why then DS1307 is not counting time.
+NEW OBSERVATION: The clock works perhaps since when I left Pi Poweroff for about 5 Mins I lost time of few secs only
+
+
+4) It looks the code/scripts that read time from RTC at bootup and sets Pi's time is correctly working since after every bootup `date` and `sudo hwclock -r` gives same values. It is taken from https://learn.adafruit.com/adding-a-real-time-clock-to-raspberry-pi/set-rtc-time.
+
+5) Test: What happens when Pi's power is completely turned off i.e. plug plugged out
+	Expected Result: I expect 3V CR2032 battery to keep the clock running. (Not that actual batter Volatge right now is just 2.86
+	Actual Result: 
+
+6) 
+
+Conclusion: Buy a new RTC clock from SparkPCB and a new button cell
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+Next task:
+Problems in existing upload system:
+1) Sometimes date is successfully sent but no affirmative reply(like "1 success", "200 OK" or "SEND OK" is received).
+2) Sometimes serial communication is stuck.
+3) Signal not being received
+4) Power related problems
+
+One way to solve problem 1, 2 is to simulate ejecting the USB and reinserting back in programmatically. I believe this will revive the stuck serial communication.
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Wind Vane:
+1) The RJ11 has two pins/wries - Red and Green which goes into wind Vane
+2) RJ11 cable coming out of Wind Vane has 4 wires - 1) Green 2) Yellow 3) Red 4) Black
+
+     ___
+     | |
+   -------
+   | | | |
+   '''''''
+   1 2 3 4
+1: green, 2:yellow, 3:Red, 4:Black   
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Tomorrow's (23 Jan 2015) tasks:
+1) Check RTC functioning
+2) Eliminate RS232
+3) Try to programmatically turn off the SIM900
+4) To cope up with the problem of unreliable RTC time, whenever pi is on update RTC time and system time from that fetched from Server.
+5) Send SMS if unable to do anything upload data
+--------------------------------------------------------------------------------------
+Date: 23 Jan 2015
+TASK: Retest RTC reliability
+Tests: 
+1) RasPi reboot: (Had to reinsert plug bcos of SD card issues) Rebooting doesn't seem to have any adverse effect on RTC
+2) Did reboot twice: again time as expected
+3) Removing raspi power for few seconds by taking out power pins from module: RTC working well (with battery)
+Since RTC seems to working great right now I m postponing task 4. Will recheck on Monday. If RTC time is wrong only then will go for that task
+
+TASK: Eliminate RS232
+Succesffuly did that. More tests yet to be done. Followed mainly this tut: https://www.youtube.com/watch?v=IZC9G3U58Sc
+
+TASK: Try to programmatically turn off SIM900
+Easily done using AT+CPOWD=1 (for normal power down). Observed that SIM900 can't no longer accept command. So need to find a way to turn on the module.
+
+Encountered UnResolved Problems:
+1) USB of GSM Module doesn't appear in the list
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Limitations of RasPi (especially over BeagleBone Black)
+1) No ADC!
+2) Much less pins
+3) connection problems. Need to connect to ethernet cable.
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+Tasks on 27 Jan, 2016
+1) Power on/off GSM module with Pi
+2) Check Solar panel capacity
+3) Buy Airtel Sim
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+1) Check Solar Panel Capacity -> 1.2Ah@20hr implies battery will last for 20 hr at usable voltage when using 65 mAmp of current. Assuming our system uses 300 mAmp of current it will last only for four hours in no sunlight!
+2) Check data usage of weather Station -> Rough calculations show 300 kb per day
+3) What if pi turns off for some reason and is stuck at boot ***************************** 2
+4) RTC time not accurate
+5) Make a new stream for all data ********************************************************************** 1
+6) Measuring sunlight intensity etc
+7) Is pi picking up time from RTC at bootup? Yes!
+8) Make a fritzing diagram
+9) Make a process flow of whole system ******************************************** 3
+10 Multiple data entries per minute why? -> This is most likely only bcos if condition inside binderNew.sh was wrong!
+11) How to charge battery without solar panel -> done (Used 12v DC adapter in parallel with diode
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+Tasks on 4 Feb, 2015
+1) Put weather station outside at around 11 ********************** 2
+2) Try to run arduino and GSM Module on capacitor *********************** 3
+3) Device sends a reply SMS when it recieves an SMS indicating status of each socket. ************ 1
+4) How to detect power off.
+5) How to detect water level of ground.
+
+Tasks on 6th Feb
+1) Run arduino and GSM Module on capacitor.

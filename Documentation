@@ -1,0 +1,59 @@
+FOR ANY DOUBTS CONTACT ME AT gopalkriagg@gmail.com
+DOCUMENTATION FOR SETTING UP SOFTWARE PART:
+Most parts of the documenation can be understood from the links provided. Follow patiently and you will understand all.
+1) Install latest NOOBS on rasPi
+2) Run "sudo apt-get update" in terminal (If your NOOBS was old it will take long time)
+3) Copy weatherStation folder(last updated 7 Feb 2016) to /home/pi directory only
+IMPORTANT: DELETE lineToBeUploadedNext.txt file if it is present during the installation. Also delete log, weatherPhant.data and weatherLocalCopy.data and rainReading.txt file if present during installation.
+4) Follow this guide to set-up i2c on pi: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c Also follow manual steps on the page if following steps don't work.
+5) Setting up BMP085: Follow this guide https://learn.adafruit.com/using-the-bmp085-with-raspberry-pi/
+	1) Make sure you are able to i2cdetect the sensor after making the connections
+	2) Run the scripts mentioned on https://learn.adafruit.com/using-the-bmp085-with-raspberry-pi/using-the-adafruit-bmp-python-library; the required github folder is already downloaded in bmp085 directory (DON'T DOWNLOAD AGAIN) but you will still need internet access
+	3) Make sure it is working correcty by running simpletest.py & simpletest_copy.py before moving on.
+6) Follow dht-humidity-sensing-on-raspberry-pi-with-gdocs-logging.pdf inside dht11 folder to setup dht11. Again don't download new repo. Use the downloaded one. Run example scripts after following the steps mentioned in the guide file to confirm that sensor is working. Connect sensor output to pin 4 only.
+7) Make connections of wind speed, direction and rain gauge meters.
+8) Run these commands: "sudo pip install nanpy", "sudo pip install bash"
+9) Follow this guide https://learn.adafruit.com/downloads/pdf/adding-a-real-time-clock-to-raspberry-pi.pdf to set-up RTC clock
+10) Follow this guide to enable ttyAMA0 (by disabling getty) for use: https://www.raspberrypi.org/forums/viewtopic.php?p=139945
+11) Modify rc.local file in /etc/rc.local as done in original weatherStation
+12) Also modify root user's crontab (by the command: sudo crontab -e) as done in original weatherStation
+13) Modify crontab file (by the command: crontab -e) as done in original weatherStation
+14) StationName is the pi's hostname. Change hostname to e.g. Sector75Mohali to indicate weatherStatio is installed in whatever location.
+15) You also need to create a new phant stream on data.sparkfun.com where data will be logged. Copy the private and public key when making the new stream into phant-loggerGSM.py script's apporpriate variable.
+Optionally also install: sudo apt-get install minicom for debugging purposes
+
+
+DOCUMENTATION FOR SETTING UP HARDWARE PART:
+1) Power to RasPi is being given through a Solar Panel attached battery which gives 12 V output. This 12V DC Volt is reduced to 5V by using a buck converter and through a micro USB cable RasPi is powered.
+2) Power to GSM Module is directly being given through 12V battery.
+3) There are not a lot of connection and most of them are power 3.3V or GND connections. Only RTC module needs 5V supply. Rest all need 3.3V.
+4) Because of lack of ADC in RasPi Arduino is used to read the analog values from wind direction sensor.
+5) Jumper wire connections (which are not obvious) can be referred from code)
+6) I2C bus has 2 things attached: RTC and BMP pressure sensor
+7) Keep temp, humidity sensor outside the box for ventilation. Read more at installtion of weather station at http://www.wunderground.com/weatherstation/installationguide.asp
+
+How the WeatherStation System Works:
+THE BEST WAY TO UNDERSTAND IS TO FOLLOW THE RUNNING SCRIPTS IN ORDER AND PATIENTLY UNDERSTADNING WHAT EACH ONE IS DOING.
+1) When the system boots scripts inside /etc/rc.local run. Here I have these two lines before the last line of the script:
+"
+printf "Setting up RTC DS1307\n"
+echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device
+sudo hwclock -s
+
+pr1intf "Turning on GSM Module\n"
+python /home/pi/weatherStation/startGSMModule.py
+"
+The printf lines explain the meaning of these lines.
+2) Another script runs at boot time and the command to start this script is written in "sudo crontab -e" which is: @reboot python /home/pi/weatherStation/getRainGaugeReading.py & This starts the script which takes the RainGaugeReading and this python script runs the whole time(i.e does not end)
+
+3) Now the main part happens here: In user pi's crontab file following two lines have been added:
+*/3 * * * * /home/pi/weatherStation/binderNew.sh >> weatherNew.data	
+*/3 * * * * date >> file
+The first line runs binderNew script every 3 mins and stores the result of script in weatherNew.data file (in /home/pi dir). This is to maintain log of whatever is happening. Working of binderNew.sh is explained later below.
+The second line does nothing special. It runs date command every 3 mins and writes the output to file 'file' in /home/pi. This helps maintain track of when pi was running and when not.
+4) Working of binderNew.sh: I have added comments in each line to explain the working of this script.
+5) getRainGaugeReading.py is also self explanatory with comments.
+6) getWindDirection.py is self explanatory.
+7) phant-loggerGSM.py is a very important file as most of the magic happens here. Again file is self explanatory
+If scripts are not running properly (bcos of some error in code) try to manually run them by "sh binderNew.sh". This should print error if any.
+THE BEST WAY TO UNDERSTAND IS TO FOLLOW THE RUNNING SCRIPTS IN ORDER AND PATIENTLY UNDERSTADNING WHAT EACH ONE IS DOING.

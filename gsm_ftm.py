@@ -86,7 +86,7 @@ print x
 ser.flushInput()
 
 #Set the file name which we want to upload to the server, which in our case is batman.jpg
-ser.write('AT+FTPPUTNAME=" /home/tuti/Downloads/batman.jpg "\r\n')
+ser.write('AT+FTPPUTNAME=" /home/pi/Downloads/batman.jpg "\r\n')
 time.sleep(0.1)
 x = ser.read(50)
 print x
